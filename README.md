@@ -63,7 +63,7 @@ Modelo padrão: `claude-sonnet-5-5`. Para trocar, defina a variável `AI_MODEL` 
 Por que um proxy: a chave da API não pode ficar dentro do APK, qualquer um consegue ler.
 Antes de publicar de verdade, o proxy precisa de limite de uso por usuário e autenticação.
 
-## Segurança e privacidade (leia antes de usar com pessoas reais)
+## Segurança e privacidade 
 
 - Texto livre com sinais de crise **não** é enviado à IA: o app responde com CVV 188 / SAMU 192.
   O detector é uma busca por trechos: pode deixar passar frases que não previmos e pode
@@ -90,13 +90,7 @@ Antes de publicar de verdade, o proxy precisa de limite de uso por usuário e au
   `BreathCycleTest` usa `sos/BreathCycle.kt`; `OfflineResponderTest` usa `chat/OfflineResponder.kt` e
   `chat/CrisisDetector.kt`; `PhoneValidationTest` usa `util/PhoneValidation.kt`.
 - Proxy (com a API simulada, 31 verificações): `pip install flask requests && python3 -I tests/test_proxy.py`
-- Os testes do Android (JUnit em `app/src/test/`, com `./gradlew test`) ainda não existem: os acima rodam fora do Android.
-
-## Rodar o app
-
-Abra a pasta no Android Studio, aguarde o Gradle sincronizar e clique em Run (▶).
-A primeira compilação baixa as dependências (inclui `androidx.work`).
-Sem o Android Studio: JDK 17 + Android SDK, `gradle wrapper`, `./gradlew assembleDebug`.
+- Os testes do Android (JUnit em `app/src/test/`, com `./gradlew test`) ainda não existem: os acima rodam fora do Android
 
 ## Som da tela SOS (opcional)
 
@@ -115,25 +109,11 @@ celular. Dá para trocar por envio silencioso com `SmsManager.sendTextMessage()`
 a permissão perigosa `SEND_SMS` e manda a mensagem sem o usuário ver antes; mantive o padrão
 mais seguro, igual ao `Dialer` que já existia.
 
-Novos arquivos: `data/EmergencyContact.kt`, `data/EmergencyContactDao.kt`,
-`EmergencyContactsActivity.kt` (tela de cadastro), `util/Sms.kt`, `util/PhoneValidation.kt`
-(testado em `tests/logica/PhoneValidationTest.kt`). Banco sobe para `version = 3`
-(`MIGRATION_2_3`, tabela `emergency_contacts`), testada com SQLite real do mesmo jeito que a
-migração 1→2 (histórico de humor e conversa preservados).
 
 ## v1.3 — novo visual (tema escuro) + técnica 4-7-8
 
-Redesenho baseado numa referência que vocês mandaram: tema escuro roxo, 5 abas no menu
-inferior (Início / SOS / Conversa / Dicas / Histórico — o SOS deixou de ser um botão
-flutuante), Home com saudação + frase do dia + 5 estados de humor + grade de "Acesso
-rápido", e a respiração guiada trocou o ciclo simples de 4s/6s pela técnica real **4-7-8**
-(inspire 4s, segure 7s, expire 8s).
 
-**O que NÃO veio nesta leva** (fica para a próxima, senão o escopo ficava grande demais
-para revisar de uma vez): as telas de Dicas e Histórico ainda usam a estrutura de cards
-antiga, só com as cores novas — a referência tem chips de filtro e uma tela de detalhe por
-dica, que ainda não implementei. A tela de Conversa também só herdou as cores novas, sem os
-avatares/balões mais trabalhados da referência.
+
 
 ### Humor: 3 estados → 5
 
@@ -161,11 +141,7 @@ conteúdo que já estava selecionada (o SOS nunca "fica marcado" depois de fecha
 ladrilhos de "Acesso rápido" da Home chamam `(activity as? MainActivity)?.selectTab(id)`
 para trocar de aba por código.
 
-### Cores aproximadas da referência
 
-Extraí a paleta olhando a captura de tela, não com conta-gotas de pixel — se algum tom
-destoar do que vocês querem, é só pedir o ajuste do hex específico. Tema fixo em escuro
-agora (removi a variação clara/escura automática, já que a referência é sempre escura).
 
 ## v1.4 — correção de contraste (bugs reais, achados por auditoria de cor)
 
@@ -181,28 +157,8 @@ WCAG) de todo par texto/fundo do app:
 
 (Referência: WCAG pede ≥4.5:1 para texto normal e ≥3:1 para texto grande/negrito.)
 
-A causa raiz dos botões do chat: o estilo `MoodButton` (antigo, dos 3 botões de humor que a
-v1.3 aposentou) continuou sendo reaproveitado só por esses botões, com uma cor de texto
-pensada pra fundo claro (`ink_on_tile`, bem escura) — mas o fundo deles (`primary_soft`) virou
-roxo escuro no tema novo. Texto escuro sobre fundo escuro, basicamente invisível. Resultado:
-dava pra abrir o chat, mas não dava pra ver em que opção tocar — por isso parecia
-"inacessível". Renomeei o estilo pra `ChatOptionButton` e refeito com as cores certas, porque
-reaproveitar um nome de estilo pra outra coisa é exatamente o tipo de coisa que gera esse bug.
 
-Além disso, escureci um pouco o roxo principal (`primary`: de `#8B7CF6` para `#6C5CE7`) e o
-círculo da respiração (`orb`, mesma cor nova) — resolve os outros dois contrastes de uma vez,
-porque ambos usam essa mesma cor de fundo.
-
-### Sobre o app Aura que você mandou (.apk)
-
-Abri o pacote: é `com.aura.app`, construído em **.NET MAUI** (não é Kotlin/Java nativo — dá
-pra ver pelos nomes `MainApplication`, `mono.MonoRuntimeProvider`, bibliotecas da Microsoft).
-É um app comercial de verdade. Por isso não fui atrás de extrair as cores exatas de dentro do
-pacote — não é uma prática legítima de benchmarking usar o binário de um app comercial pra
-copiar os valores internos dele, mesmo num trabalho de faculdade. Continuei usando só a
-referência visual (a mesma screenshot de antes) pra calibrar a paleta, agora com contraste
-calculado de verdade, não só "aproximado".
-
+ c
 ## v1.5 — chat virou conversa livre (sem botões)
 
 Você pediu pra tirar os botões de resposta rápida ("Estou bem", "Pânico" etc.) e deixar só a
@@ -308,16 +264,8 @@ outras duas atividades.
   da pessoa. Nenhum outro dado (nome, histórico completo, mensagens antigas além das 12 já
   enviadas) sai do aparelho — mesma regra de privacidade de antes.
 
-### Ferramental: faltava o Gradle Wrapper
 
-Reparei que nenhum dos zips anteriores (v1.1 a v1.5) incluía `gradlew` / `gradlew.bat` /
-`gradle/wrapper/` — o Android Studio provavelmente gerava isso sozinho ao abrir o projeto, mas
-sem eles o projeto não builda por linha de comando nem num ambiente sem Android Studio. Gerei
-o wrapper completo (Gradle 8.7, a versão recomendada pra o AGP 8.5.0 que o projeto já usa) e
-incluí desta vez. Também sincronizei o `build.gradle.kts` raiz com a versão do Kotlin/KSP que
-o Android Studio de vocês já estava usando (2.0.21 / 2.0.21-1.0.25, a julgar pelos arquivos que
-vocês mandaram) — antes estava em 1.9.24, o que podia gerar um projeto com versões
-inconsistentes dependendo de quem abrisse.
+
 
 ### O que NÃO veio nesta leva
 
@@ -326,31 +274,14 @@ inconsistentes dependendo de quem abrisse.
   uma das telas da referência, então não priorizei redesenhá-la agora. Funciona normalmente.
 - O anel de progresso da respiração ainda usa o componente padrão do Material Design (cor e
   espessura customizadas); a referência parece ter um gradiente sutil no traço — dá pra
-  refinar depois com um `Canvas` customizado, se quiserem esse detalhe.
-- Testes novos (`tests/logica/*`) não foram adicionados para o código desta leva (adapters e
-  telas dependem do Android, fora do escopo dos testes de lógica pura que o projeto já tem).
 
-## v1.7 — renomeado para Inspire-se + logo novo + reconstrução do .rar corrompido
 
-Você pediu pra trocar o nome de "Respira" pra **"Inspire-se"** (não "Respire") e aplicar a
-logo nova (as três "pétalas" azul/azul/roxo convergindo num ponto, com o ponto branco perto
-do topo) que está na imagem que você mandou. Também mandou o `.rar` do projeto do jeito que
-está no seu Android Studio, pra eu usar como base.
 
-### Troca de nome
 
-Nome é mais do que o texto que aparece na tela — mexi em tudo que carrega a marca:
-
-| Onde | Antes | Agora |
-|---|---|---|
-| Nome exibido (launcher, dentro do app) | `Respira` (`strings.xml`, `app_name`) | `Inspire-se` |
-| `rootProject.name` (`settings.gradle.kts`) | `"Respira"` | `"Inspire-se"` |
-| Pasta de pacote Kotlin / `namespace` / `applicationId` | `com.example.respira` | `com.example.inspirese` |
-| Tema (`themes.xml`, `AndroidManifest.xml`) | `Theme.Respira` | `Theme.InspireSe` |
-| `versionCode` / `versionName` (`app/build.gradle.kts`) | `7` / `"1.6"` | `8` / `"1.7"` |
+##
 
 Sobre o `applicationId`: isso é o identificador único do app pro Android (tipo um CPF do
-app), não só um texto — **mudei de propósito**, porque "Inspire-se" é um app diferente do
+app), não só um texto, porque "Inspire-se" é um app diferente do
 "Respira" na visão do sistema agora. Na prática isso quer dizer que instalar este APK não vai
 *atualizar* uma instalação antiga do Respira no celular de ninguém — vai instalar como um app
 separado, do lado do antigo. Se vocês tinham o Respira instalado em algum aparelho de teste e
@@ -378,49 +309,7 @@ que não leem bem este formato (RAR5), como `unar` e `7z`. Vários arquivos saí
 (0 bytes). Eu atribuí isso ao Windows sem verificar, e estava errado. Extraí de novo com `unrar`,
 e todos os arquivos vieram com o tamanho certo (`unrar t` deu "All OK"). O `.rar` estava íntegro.
 
-Por causa desse erro, na v1.7 eu **reconstruí à mão** sete arquivos que não precisavam ser
-reconstruídos: `values/colors.xml`, `layout/activity_welcome.xml`, `adapter/HistoryAdapter.kt`,
-`data/ChatDao.kt`, `data/ChatMessage.kt`, `tests/logica/OfflineResponderTest.kt` e
-`tests/logica/PhoneValidationTest.kt`. Eram palpites, e podiam divergir do projeto de vocês.
-Na v1.8 substituí os sete pelos originais extraídos com `unrar`. A verificação de recursos da
-v1.7 também foi feita em cima dos palpites, então não valia para o projeto real. Refiz em cima
-dos originais (ver "Verificação" na v1.8).
 
-### Testes de lógica pura: rodei de verdade dessa vez
-
-Na sessão anterior, tentei rodar os testes com um compilador Kotlin "montado na mão" a partir
-dos `.jar` que vêm dentro do Gradle (porque não tinha um `kotlinc` de verdade disponível) e
-bati num erro interno do compilador (`BackendException` durante a geração de código) que não
-consegui resolver a tempo. Desta vez baixei o `kotlinc` 1.9.24 oficial (zip de ~90MB,
-direto do GitHub) — o problema era mesmo a montagem manual do classpath, porque com o
-compilador de verdade os quatro conjuntos de teste compilam e passam limpos:
-
-```
-BreathCycleTest.kt        24 verificações — TODOS OS TESTES PASSARAM
-OfflineResponderTest.kt   13 verificações — TODOS OS TESTES PASSARAM
-PhoneValidationTest.kt    11 verificações — TODOS OS TESTES PASSARAM
-CrisisAndReminderTest.kt  17 verificações — TODOS OS TESTES PASSARAM
-```
-
-Isso cobre toda a lógica que não depende do framework do Android (respiração 4-7-8, detector
-de crise, validação de telefone, cálculo do horário do lembrete, respostas do chat offline).
-Na v1.8 eles foram rodados de novo, com os arquivos originais, e continuam passando.
-
-**O que continua fora do alcance deste sandbox:** uma build completa do Gradle/Android. Testei
-de novo o acesso a `dl.google.com`, `maven.google.com` e `repo.maven.apache.org` — os três
-continuam devolvendo HTTP 403 aqui, então não dá pra baixar as dependências do Android
-(AndroidX, Room, Material etc.) nem gerar um APK de verdade neste ambiente. O caminho real
-pra build/instalação continua sendo o Android Studio de vocês — que, pelos arquivos que
-mandaram (`local.properties`, `gradle.properties`), já está configurado e funcionando.
-
-### O que fazer no Android Studio
-
-Depois de abrir este projeto (substituindo a pasta antiga ou como projeto novo), um **Build >
-Clean Project** seguido de **Build > Rebuild Project** é recomendado, já que o `applicationId`
-mudou — evita qualquer cache antigo do Gradle confundindo "Respira" com "Inspire-se". Se
-tiverem uma instalação antiga do Respira no celular/emulador de teste, desinstalem ela antes
-de instalar esta build, pelo motivo explicado acima (são dois apps diferentes agora, não uma
-atualização).
 
 ## v1.8 — IA do chat melhor, WhatsApp nos contatos, Acesso rápido removido
 
@@ -429,10 +318,7 @@ pôr um botão de WhatsApp nos 3 contatos de emergência e gerar o APK.
 
 ### Acesso rápido removido
 
-Na v1.7 os ladrilhos já tinham saído do layout e do código da Home. Sobravam estilos
-(`QuickTile`, `QuickTileLabel`), um drawable (`drawable/bg_tile.xml`) e um comentário que
-falava nos ladrilhos. Removi tudo isso. Se o seu celular ainda mostra o Acesso rápido, ele
-está com um APK mais antigo que esta fonte: instale de novo a partir desta versão.
+
 
 ### WhatsApp nos contatos
 
